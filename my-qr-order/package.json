@@ -1,0 +1,8 @@
+{
+  "name": "my-qr-order",
+  "version": "1.0.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "midtrans-client": "^1.3.1"
+  }
+}
