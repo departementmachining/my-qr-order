@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     // TEMPEL SERVER KEY SANDBOX KAMU LANGSUNG DI SINI (DENGAN TITIK DUA DI AKHIR)
     // Contoh: "SB-Mid-server-xxxxxxx:"
     // -------------------------------------------------------------
-    const rawServerKey = "SB-Mid-server-4WuTrqETNojiQYtOywScOXyt:"; 
+    const rawServerKey = "SB-Mid-server-Ixr2hmesv1mk2eVHVlb1inx2:"; 
     
     // Encode langsung ke Base64
     const authString = Buffer.from(rawServerKey).toString('base64');
