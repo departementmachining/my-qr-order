@@ -12,15 +12,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Keranjang belanja kosong' });
     }
 
-    // -------------------------------------------------------------
-    // TEMPEL SERVER KEY SANDBOX KAMU LANGSUNG DI SINI (DENGAN TITIK DUA DI AKHIR)
-    // Contoh: "SB-Mid-server-xxxxxxx:"
-    // -------------------------------------------------------------
-    const rawServerKey = "SB-Mid-server-Ixr2hmesv1mk2eVHVlb1inx2:"; 
-    
-    // Encode langsung ke Base64
-    const authString = Buffer.from(rawServerKey).toString('base64');
+    const serverKey = (process.env.MIDTRANS_SERVER_KEY || '').trim();
 
+    if (!serverKey) {
+      return res.status(500).json({ message: 'MIDTRANS_SERVER_KEY belum diisi di Vercel' });
+    }
+
+    // Basic Auth Midtrans
+    const authString = Buffer.from(`${serverKey}:`).toString('base64');
     const grossAmount = items.reduce((sum, item) => sum + (Number(item.price) * Number(item.qty)), 0);
     const orderId = `ORDER-${Date.now()}-TBL${table_number || '0'}`;
 
