@@ -1,36 +1,32 @@
-const midtransClient = require('midtrans-client');
-
 export default async function handler(req, res) {
+  // Set header agar respon selalu berupa JSON
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    const { table_number, items } = req.body;
+    const { table_number, items } = req.body || {};
 
-    if (!items || items.length === 0) {
+    if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: 'Keranjang belanja kosong' });
     }
 
-    // Ambil key dan bersihkan dari spasi
+    // Ambil dan bersihkan Server Key dari Vercel
     const serverKey = (process.env.MIDTRANS_SERVER_KEY || '').trim();
-    const clientKey = (process.env.MIDTRANS_CLIENT_KEY || '').trim();
 
-    // Validasi sederhana jika key belum diset
     if (!serverKey) {
-      return res.status(500).json({ message: 'MIDTRANS_SERVER_KEY belum dikonfigurasi di Vercel' });
+      return res.status(500).json({ message: 'MIDTRANS_SERVER_KEY belum diisi di Vercel' });
     }
 
-    const snap = new midtransClient.Snap({
-      isProduction: false,
-      serverKey: serverKey,
-      clientKey: clientKey
-    });
+    // Encode Server Key ke Base64 untuk Basic Auth Midtrans
+    const authString = Buffer.from(`${serverKey}:`).toString('base64');
 
-    const grossAmount = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const grossAmount = items.reduce((sum, item) => sum + (Number(item.price) * Number(item.qty)), 0);
     const orderId = `ORDER-${Date.now()}-TBL${table_number || '0'}`;
 
-    const parameter = {
+    const payload = {
       transaction_details: {
         order_id: orderId,
         gross_amount: grossAmount
@@ -43,13 +39,27 @@ export default async function handler(req, res) {
       }))
     };
 
-    const transaction = await snap.createTransaction(parameter);
-    return res.status(200).json(transaction);
+    // Panggil API Midtrans Snap Sandbox langsung
+    const response = await fetch('https://app.sandbox.midtrans.com/snap/v1/transactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Basic ${authString}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    // Kirim Snap Token ke Frontend
+    return res.status(200).json(data);
 
   } catch (error) {
-    return res.status(error.httpStatusCode || 500).json({ 
-      message: error.message || 'Gagal memproses transaksi',
-      details: error 
-    });
+    return res.status(500).json({ message: error.message || 'Server error' });
   }
 }
