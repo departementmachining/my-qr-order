@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Pemesanan Resto</title>
+  <title>Kedai Resto Lezat - Order System</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Midtrans Snap JS (Sandbox Mode) -->
-  <!-- Ganti SB-Mid-client-YOUR_CLIENT_KEY dengan Client Key dari Sandbox Midtrans kamu -->
-  <script type="text/javascript" 
-          src="https://app.sandbox.midtrans.com/snap/snap.js" 
-          data-client-key="SB-Mid-client-2CfiG-10WnCNhDNx"></script>
+  <!-- PASTE Client Key Sandbox kamu di data-client-key di bawah ini -->
+  <script type="text/javascript"
+    src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="SB-Mid-client-2CfiG-10WnCNhDNx"></script>
 </head>
 <body class="bg-gray-100 font-sans pb-28 max-w-md mx-auto min-h-screen border-x border-gray-200">
 
@@ -20,166 +20,182 @@
   <div class="bg-red-600 text-white p-4 sticky top-0 z-10 shadow-md flex justify-between items-center">
     <div>
       <h1 class="font-bold text-lg leading-tight">Kedai Resto Lezat</h1>
-      <p id="table-info" class="text-xs text-red-100 mt-0.5">Memuat meja...</p>
+      <p id="table-info" class="text-xs text-red-100 mt-0.5">Meja: Loading...</p>
     </div>
-    <span class="bg-red-700 text-xs px-2.5 py-1 rounded-full border border-red-500 font-medium">Self Order</span>
+    <span class="bg-red-700 text-xs px-2.5 py-1 rounded-full font-medium">Self Order</span>
   </div>
 
   <!-- Banner Info -->
-  <div class="bg-red-50 p-3 mx-4 mt-4 rounded-lg border border-red-200 text-xs text-red-800">
-    💡 Pilih menu favoritmu, lalu selesaikan pembayaran via QRIS/E-Wallet untuk mengirim pesanan ke dapur.
+  <div class="p-4">
+    <div class="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg shadow-sm">
+      💡 Pilih menu favoritmu, lalu selesaikan pembayaran via QRIS/E-Wallet untuk mengirim pesanan ke dapur.
+    </div>
   </div>
 
-  <!-- Menu List Container -->
-  <div class="p-4 space-y-4" id="menu-container">
-    <h2 class="font-bold text-gray-800 text-base">Daftar Menu</h2>
-    
-    <!-- Item Menu 1 -->
-    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
-      <div>
-        <h3 class="font-semibold text-gray-800 text-sm">Mie Goreng Spesial</h3>
-        <p class="text-xs text-gray-500 mt-0.5">Mie goreng pedas manis + telur</p>
-        <p class="text-sm font-bold text-red-600 mt-1">Rp 15.000</p>
-      </div>
-      <button onclick="addToCart('SKU-01', 'Mie Goreng Spesial', 15000)" 
-              class="bg-red-600 hover:bg-red-700 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition active:scale-95 shadow-sm">
-        + Tambah
-      </button>
+  <!-- Daftar Menu -->
+  <div class="px-4">
+    <h2 class="font-bold text-gray-800 text-base mb-3">Daftar Menu</h2>
+    <div id="menu-list" class="space-y-3">
+      <!-- Menu item di-render lewat JavaScript -->
     </div>
+  </div>
 
-    <!-- Item Menu 2 -->
-    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+  <!-- Sticky Bottom Bar (Keranjang & Checkout) -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-md mx-auto shadow-lg z-20">
+    <div class="flex justify-between items-center">
       <div>
-        <h3 class="font-semibold text-gray-800 text-sm">Nasi Goreng Ayam</h3>
-        <p class="text-xs text-gray-500 mt-0.5">Nasi goreng bumbu rempah + suwiran ayam</p>
-        <p class="text-sm font-bold text-red-600 mt-1">Rp 18.000</p>
+        <p id="cart-count" class="text-xs text-gray-500">0 Item terpilih</p>
+        <p id="cart-total" class="font-bold text-lg text-gray-900">Rp 0</p>
       </div>
-      <button onclick="addToCart('SKU-02', 'Nasi Goreng Ayam', 18000)" 
-              class="bg-red-600 hover:bg-red-700 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition active:scale-95 shadow-sm">
-        + Tambah
-      </button>
-    </div>
-
-    <!-- Item Menu 3 -->
-    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
-      <div>
-        <h3 class="font-semibold text-gray-800 text-sm">Es Teh Manis</h3>
-        <p class="text-xs text-gray-500 mt-0.5">Teh segar manis dingin</p>
-        <p class="text-sm font-bold text-red-600 mt-1">Rp 5.000</p>
-      </div>
-      <button onclick="addToCart('SKU-03', 'Es Teh Manis', 5000)" 
-              class="bg-red-600 hover:bg-red-700 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition active:scale-95 shadow-sm">
-        + Tambah
+      <button id="btn-checkout" onclick="handleCheckout()" disabled
+        class="bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition">
+        Bayar Sekarang
       </button>
     </div>
   </div>
 
-  <!-- Floating Bottom Cart Bar -->
-  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-md mx-auto shadow-lg z-20 flex justify-between items-center">
-    <div>
-      <p id="cart-item-count" class="text-xs text-gray-500">0 Item terpilih</p>
-      <p id="total-price" class="font-bold text-base text-red-600">Rp 0</p>
-    </div>
-    <button id="btn-checkout" 
-            onclick="processCheckout()" 
-            class="bg-gray-400 text-white text-sm px-5 py-2.5 rounded-xl font-bold transition shadow" 
-            disabled>
-      Bayar Sekarang
-    </button>
-  </div>
-
-  <!-- JavaScript Application Logic -->
+  <!-- Script Logika Frontend -->
   <script>
-    // 1. Deteksi Nomor Meja dari Parameter URL (?table=05)
-    const urlParams = new URLSearchParams(window.location.search);
-    const tableNumber = urlParams.get('table') || 'Takeaway';
-    document.getElementById('table-info').innerText = `Meja: ${tableNumber}`;
+    // Data Menu Restoran
+    const menuData = [
+      { id: "M1", name: "Mie Goreng Spesial", price: 15000, desc: "Mie goreng pedas manis + telur" },
+      { id: "M2", name: "Nasi Goreng Ayam", price: 18000, desc: "Nasi goreng komplit dengan potongan ayam" },
+      { id: "M3", name: "Es Teh Manis", price: 5000, desc: "Teh segar manis dingin" }
+    ];
 
-    // State Keranjang Belanja
-    let cart = [];
+    // Keranjang Belanja
+    let cart = {};
+    let tableNumber = "Takeaway";
 
-    // 2. Fungsi Menambahkan Item ke Keranjang
-    function addToCart(id, name, price) {
-      const existingItem = cart.find(item => item.id === id);
-      if (existingItem) {
-        existingItem.qty += 1;
-      } else {
-        cart.push({ id, name, price, qty: 1 });
+    // Inisialisasi Aplikasi
+    window.onload = () => {
+      // Ambil nomor meja dari parameter URL (contoh: ?table=05)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('table')) {
+        tableNumber = urlParams.get('table');
       }
-      updateCartUI();
+      document.getElementById('table-info').innerText = `Meja: ${tableNumber}`;
+
+      renderMenu();
+    };
+
+    // Render Menu ke DOM
+    function renderMenu() {
+      const container = document.getElementById('menu-list');
+      container.innerHTML = '';
+
+      menuData.forEach(item => {
+        const qty = cart[item.id] ? cart[item.id].qty : 0;
+        const html = `
+          <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
+            <div class="pr-2">
+              <h3 class="font-semibold text-gray-800 text-sm">${item.name}</h3>
+              <p class="text-xs text-gray-400 mt-0.5">${item.desc}</p>
+              <p class="font-bold text-red-600 text-sm mt-1">Rp ${item.price.toLocaleString('id-ID')}</p>
+            </div>
+            <div>
+              ${qty === 0 ? `
+                <button onclick="addToCart('${item.id}')" class="bg-red-50 text-red-600 font-semibold text-xs px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-100">
+                  + Tambah
+                </button>
+              ` : `
+                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-lg p-1">
+                  <button onclick="updateQty('${item.id}', -1)" class="w-6 h-6 bg-white shadow text-gray-700 font-bold rounded flex items-center justify-center text-xs">-</button>
+                  <span class="text-xs font-bold w-4 text-center">${qty}</span>
+                  <button onclick="updateQty('${item.id}', 1)" class="w-6 h-6 bg-red-600 text-white font-bold rounded flex items-center justify-center text-xs">+</button>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+        container.innerHTML += html;
+      });
+
+      updateCartSummary();
     }
 
-    // 3. Update Tampilan Keranjang & Tombol Bayar
-    function updateCartUI() {
-      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-      document.getElementById('cart-item-count').innerText = `${totalQty} Item terpilih`;
-      document.getElementById('total-price').innerText = `Rp ${totalPrice.toLocaleString('id-ID')}`;
-
-      const btnCheckout = document.getElementById('btn-checkout');
-      if (cart.length > 0) {
-        btnCheckout.disabled = false;
-        btnCheckout.className = "bg-red-600 hover:bg-red-700 text-white text-sm px-5 py-2.5 rounded-xl font-bold transition shadow active:scale-95 cursor-pointer";
-      } else {
-        btnCheckout.disabled = true;
-        btnCheckout.className = "bg-gray-400 text-white text-sm px-5 py-2.5 rounded-xl font-bold transition shadow cursor-not-allowed";
-      }
+    function addToCart(itemId) {
+      const item = menuData.find(m => m.id === itemId);
+      cart[itemId] = { ...item, qty: 1 };
+      renderMenu();
     }
 
-    // 4. Fungsi Checkout yang Memanggil API Serverless Vercel
-    async function processCheckout() {
-      if (cart.length === 0) return alert('Keranjang masih kosong!');
+    function updateQty(itemId, change) {
+      if (cart[itemId]) {
+        cart[itemId].qty += change;
+        if (cart[itemId].qty <= 0) {
+          delete cart[itemId];
+        }
+      }
+      renderMenu();
+    }
+
+    function updateCartSummary() {
+      const itemsArray = Object.values(cart);
+      const totalItems = itemsArray.reduce((sum, i) => sum + i.qty, 0);
+      const totalPrice = itemsArray.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+      document.getElementById('cart-count').innerText = `${totalItems} Item terpilih`;
+      document.getElementById('cart-total').innerText = `Rp ${totalPrice.toLocaleString('id-ID')}`;
 
       const btnCheckout = document.getElementById('btn-checkout');
-      btnCheckout.innerText = "Processing...";
+      btnCheckout.disabled = totalItems === 0;
+    }
+
+    // Fungsi Checkout ke Backend Vercel
+    async function handleCheckout() {
+      const btnCheckout = document.getElementById('btn-checkout');
       btnCheckout.disabled = true;
+      btnCheckout.innerText = "Processing...";
+
+      const itemsArray = Object.values(cart);
 
       try {
-        // Memanggil API Backend Vercel di /api/checkout
         const response = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             table_number: tableNumber,
-            items: cart
+            items: itemsArray
           })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Gagal memproses transaksi');
+          // Tampilkan pesan error spesifik jika status non-200
+          const errorDetail = data.message || data.error_messages?.join(', ') || JSON.stringify(data);
+          alert(`Gagal [${response.status}]: ${errorDetail}`);
+          return;
         }
 
-        // Trigger Popup Pembayaran Midtrans Snap
-        window.snap.pay(data.token, {
-          onSuccess: function(result) {
-            alert("✅ Pembayaran Berhasil! Pesanan diproses ke dapur.");
-            cart = [];
-            updateCartUI();
-            btnCheckout.innerText = "Bayar Sekarang";
-          },
-          onPending: function(result) {
-            alert("⏳ Menunggu pembayaran diproses.");
-            btnCheckout.innerText = "Bayar Sekarang";
-          },
-          onError: function(result) {
-            alert("❌ Pembayaran gagal atau dibatalkan.");
-            btnCheckout.innerText = "Bayar Sekarang";
-            updateCartUI();
-          },
-          onClose: function() {
-            btnCheckout.innerText = "Bayar Sekarang";
-            updateCartUI();
-          }
-        });
+        // Buka Pop-up Snap Pembayaran
+        if (data.token) {
+          window.snap.pay(data.token, {
+            onSuccess: function(result) {
+              alert("Pembayaran Berhasil! Pesanan dikirim ke dapur.");
+              cart = {};
+              renderMenu();
+            },
+            onPending: function(result) {
+              alert("Menunggu pembayaran...");
+            },
+            onError: function(result) {
+              alert("Pembayaran gagal!");
+            },
+            onClose: function() {
+              alert("Kamu menutup halaman pembayaran.");
+            }
+          });
+        } else {
+          alert("Gagal memproses token pembayaran dari server.");
+        }
 
       } catch (err) {
-        console.error(err);
-        alert('Gagal membuat transaksi: ' + err.message);
+        alert("Error Network: " + err.message);
+      } finally {
+        btnCheckout.disabled = false;
         btnCheckout.innerText = "Bayar Sekarang";
-        updateCartUI();
       }
     }
   </script>
