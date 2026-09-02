@@ -12,8 +12,8 @@ export default async function handler(req, res) {
     // Inisialisasi Midtrans Snap menggunakan Environment Variable Vercel
     const snap = new midtransClient.Snap({
       isProduction: false, // Ubah ke true jika sudah live production
-      serverKey: process.env.MIDTRANS_SERVER_KEY,
-      clientKey: process.env.MIDTRANS_CLIENT_KEY
+      serverKey: process.env.MIDTRANS_SERVER_KEY ? process.env.MIDTRANS_SERVER_KEY.trim() : '',
+clientKey: process.env.MIDTRANS_CLIENT_KEY ? process.env.MIDTRANS_CLIENT_KEY.trim() : ''
     });
 
     const grossAmount = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
